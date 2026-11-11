@@ -1,0 +1,12 @@
+{
+    "name": "{{APP}}-documents-ds",
+    "description": "AI copies of the documents (blob prefix ai/), written by the app with their metadata",
+    "type": "azureblob",
+    "credentials": {
+        "connectionString": "{{AZURE_STORAGE_CONNECTION_STRING}}"
+    },
+    "container": {
+        "name": "{{AZURE_STORAGE_CONTAINER}}",
+        "query": "ai/"
+    }
+}

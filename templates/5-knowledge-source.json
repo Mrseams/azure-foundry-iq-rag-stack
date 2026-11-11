@@ -1,0 +1,23 @@
+{
+    "name": "{{APP}}-documents-ks",
+    "kind": "searchIndex",
+    "description": "The documents: the shared library (scope library) and each record's own files (scope case, with case_id)",
+    "searchIndexParameters": {
+        "searchIndexName": "{{APP}}-documents",
+        "sourceDataFields": [
+            {
+                "name": "document_id"
+            },
+            {
+                "name": "case_id"
+            },
+            {
+                "name": "scope"
+            },
+            {
+                "name": "title"
+            }
+        ],
+        "semanticConfigurationName": "{{APP}}-semantic"
+    }
+}

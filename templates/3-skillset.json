@@ -1,0 +1,137 @@
+{
+    "name": "{{APP}}-documents-skillset",
+    "description": "OCR the images (scanned pages), merge their text into the document text, split it into chunks, embed them, and copy the blob metadata (document_id, case_id, scope, title) onto every chunk",
+    "skills": [
+        {
+            "@odata.type": "#Microsoft.Skills.Vision.OcrSkill",
+            "name": "ocr",
+            "context": "/document/normalized_images/*",
+            "detectOrientation": true,
+            "lineEnding": "Space",
+            "inputs": [
+                {
+                    "name": "image",
+                    "source": "/document/normalized_images/*"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "text",
+                    "targetName": "text"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
+            "name": "merge",
+            "context": "/document",
+            "insertPreTag": " ",
+            "insertPostTag": " ",
+            "inputs": [
+                {
+                    "name": "text",
+                    "source": "/document/content"
+                },
+                {
+                    "name": "itemsToInsert",
+                    "source": "/document/normalized_images/*/text"
+                },
+                {
+                    "name": "offsets",
+                    "source": "/document/normalized_images/*/contentOffset"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "mergedText",
+                    "targetName": "merged_content"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+            "name": "split",
+            "context": "/document",
+            "textSplitMode": "pages",
+            "maximumPageLength": 2000,
+            "pageOverlapLength": 200,
+            "inputs": [
+                {
+                    "name": "text",
+                    "source": "/document/merged_content"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "textItems",
+                    "targetName": "pages"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+            "name": "embed",
+            "context": "/document/pages/*",
+            "resourceUri": "{{AZURE_OPENAI_RESOURCE_URL}}",
+            "deploymentId": "{{AZURE_OPENAI_EMBEDDING_DEPLOYMENT}}",
+            "apiKey": "{{AZURE_OPENAI_KEY}}",
+            "modelName": "text-embedding-3-large",
+            "dimensions": 3072,
+            "inputs": [
+                {
+                    "name": "text",
+                    "source": "/document/pages/*"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "embedding",
+                    "targetName": "vector"
+                }
+            ]
+        }
+    ],
+    "cognitiveServices": {
+        "@odata.type": "#Microsoft.Azure.Search.AIServicesByKey",
+        "subdomainUrl": "{{AZURE_AI_SERVICES_URL}}",
+        "key": "{{AZURE_AI_SERVICES_KEY}}"
+    },
+    "indexProjections": {
+        "selectors": [
+            {
+                "targetIndexName": "{{APP}}-documents",
+                "parentKeyFieldName": "parent_id",
+                "sourceContext": "/document/pages/*",
+                "mappings": [
+                    {
+                        "name": "content",
+                        "source": "/document/pages/*"
+                    },
+                    {
+                        "name": "content_vector",
+                        "source": "/document/pages/*/vector"
+                    },
+                    {
+                        "name": "document_id",
+                        "source": "/document/document_id"
+                    },
+                    {
+                        "name": "case_id",
+                        "source": "/document/case_id"
+                    },
+                    {
+                        "name": "scope",
+                        "source": "/document/scope"
+                    },
+                    {
+                        "name": "title",
+                        "source": "/document/title"
+                    }
+                ]
+            }
+        ],
+        "parameters": {
+            "projectionMode": "skipIndexingParentDocuments"
+        }
+    }
+}

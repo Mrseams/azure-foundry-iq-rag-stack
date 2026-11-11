@@ -1,0 +1,22 @@
+{
+    "name": "{{APP}}-documents-indexer",
+    "dataSourceName": "{{APP}}-documents-ds",
+    "targetIndexName": "{{APP}}-documents",
+    "skillsetName": "{{APP}}-documents-skillset",
+    "schedule": {
+        "interval": "PT5M"
+    },
+    "parameters": {
+        "maxFailedItems": -1,
+        "maxFailedItemsPerBatch": -1,
+        "configuration": {
+            "dataToExtract": "contentAndMetadata",
+            "imageAction": "generateNormalizedImages",
+            "parsingMode": "default",
+            "indexedFileNameExtensions": ".pdf,.docx,.doc,.pptx,.xlsx,.txt,.md,.rtf,.html,.htm",
+            "failOnUnsupportedContentType": false,
+            "failOnUnprocessableDocument": false,
+            "executionEnvironment": "private"
+        }
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "name": "{{APP}}-kb",
+    "description": "Grounding for the AI answers",
+    "knowledgeSources": [
+        {
+            "name": "{{APP}}-documents-ks"
+        }
+    ],
+    "models": [
+        {
+            "kind": "azureOpenAI",
+            "azureOpenAIParameters": {
+                "resourceUri": "{{AZURE_OPENAI_RESOURCE_URL}}",
+                "deploymentId": "{{AZURE_OPENAI_CHAT_DEPLOYMENT}}",
+                "apiKey": "{{AZURE_OPENAI_KEY}}",
+                "modelName": "gpt-5"
+            }
+        }
+    ],
+    "retrievalReasoningEffort": {
+        "kind": "low"
+    },
+    "outputMode": "extractiveData",
+    "retrievalInstructions": "{{RETRIEVAL_INSTRUCTIONS}}"
+}

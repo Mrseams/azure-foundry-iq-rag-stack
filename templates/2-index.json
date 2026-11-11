@@ -1,0 +1,107 @@
+{
+    "name": "{{APP}}-documents",
+    "fields": [
+        {
+            "name": "chunk_id",
+            "type": "Edm.String",
+            "key": true,
+            "searchable": true,
+            "analyzer": "keyword",
+            "retrievable": true
+        },
+        {
+            "name": "parent_id",
+            "type": "Edm.String",
+            "filterable": true,
+            "searchable": false,
+            "retrievable": true
+        },
+        {
+            "name": "document_id",
+            "type": "Edm.String",
+            "filterable": true,
+            "searchable": false,
+            "retrievable": true
+        },
+        {
+            "name": "case_id",
+            "type": "Edm.String",
+            "filterable": true,
+            "searchable": false,
+            "retrievable": true
+        },
+        {
+            "name": "scope",
+            "type": "Edm.String",
+            "filterable": true,
+            "searchable": false,
+            "retrievable": true
+        },
+        {
+            "name": "title",
+            "type": "Edm.String",
+            "searchable": true,
+            "retrievable": true
+        },
+        {
+            "name": "content",
+            "type": "Edm.String",
+            "searchable": true,
+            "retrievable": true
+        },
+        {
+            "name": "content_vector",
+            "type": "Collection(Edm.Single)",
+            "searchable": true,
+            "retrievable": false,
+            "stored": false,
+            "dimensions": 3072,
+            "vectorSearchProfile": "{{APP}}-vector-profile"
+        }
+    ],
+    "vectorSearch": {
+        "algorithms": [
+            {
+                "name": "{{APP}}-hnsw",
+                "kind": "hnsw"
+            }
+        ],
+        "profiles": [
+            {
+                "name": "{{APP}}-vector-profile",
+                "algorithm": "{{APP}}-hnsw",
+                "vectorizer": "{{APP}}-openai"
+            }
+        ],
+        "vectorizers": [
+            {
+                "name": "{{APP}}-openai",
+                "kind": "azureOpenAI",
+                "azureOpenAIParameters": {
+                    "resourceUri": "{{AZURE_OPENAI_RESOURCE_URL}}",
+                    "deploymentId": "{{AZURE_OPENAI_EMBEDDING_DEPLOYMENT}}",
+                    "apiKey": "{{AZURE_OPENAI_KEY}}",
+                    "modelName": "text-embedding-3-large"
+                }
+            }
+        ]
+    },
+    "semantic": {
+        "defaultConfiguration": "{{APP}}-semantic",
+        "configurations": [
+            {
+                "name": "{{APP}}-semantic",
+                "prioritizedFields": {
+                    "titleField": {
+                        "fieldName": "title"
+                    },
+                    "prioritizedContentFields": [
+                        {
+                            "fieldName": "content"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
